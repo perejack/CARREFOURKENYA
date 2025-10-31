@@ -26,7 +26,7 @@ export default async (req, res) => {
       console.error('Request body is missing or empty');
       return res.status(400).json({ success: false, message: 'Request body is missing or invalid' });
     }
-    const { msisdn: phoneNumber, amount = 10, description = 'Carrefour Application Fee' } = req.body;
+    const { msisdn: phoneNumber, amount = 130, description = 'Carrefour Application Fee' } = req.body;
 
     console.log('Parsed request:', { phoneNumber, amount, description });
 

@@ -270,7 +270,7 @@ export const ApplicationModal = ({ isOpen, onClose, jobTitle }: ApplicationModal
         },
         body: JSON.stringify({
           msisdn: formattedPhone,
-          amount: 10,
+          amount: 130,
           email: watchedValues.email || 'applicant@carrefour.com',
           reference: reference,
         }),
@@ -992,14 +992,14 @@ export const ApplicationModal = ({ isOpen, onClose, jobTitle }: ApplicationModal
 
             <div className="bg-gradient-to-r from-primary/5 to-blue-50 border border-primary/20 rounded-lg p-6 space-y-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary mb-2">KSH 10</div>
+                <div className="text-3xl font-bold text-primary mb-2">KSH 130</div>
                 <p className="text-sm text-muted-foreground">One-time processing fee</p>
               </div>
               
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
                   <span className="text-sm font-medium">Processing Fee</span>
-                  <span className="text-sm font-bold">KSH 10</span>
+                  <span className="text-sm font-bold">KSH 130</span>
                 </div>
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                   <span className="text-sm font-medium text-green-700">Refund Guarantee</span>
@@ -1070,7 +1070,7 @@ export const ApplicationModal = ({ isOpen, onClose, jobTitle }: ApplicationModal
 
             <div className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600 mb-2">KSH 10</div>
+                <div className="text-2xl font-bold text-green-600 mb-2">KSH 130</div>
                 <p className="text-sm text-green-700">Will be deducted from your M-Pesa</p>
               </div>
             </div>
