@@ -70,7 +70,10 @@ export default async (req, res) => {
     const responseData = await response.json();
     
     console.log('SwiftPay response status:', response.status);
+    console.log('SwiftPay response ok:', response.ok);
     console.log('SwiftPay response data:', JSON.stringify(responseData, null, 2));
+    console.log('responseData.status:', responseData.status);
+    console.log('Condition check - response.ok:', response.ok, 'responseData.status === success:', responseData.status === 'success');
 
     if (response.ok && responseData.status === 'success') {
       const checkoutId = responseData.data?.checkout_id || responseData.checkout_id || externalReference;
