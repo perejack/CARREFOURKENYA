@@ -72,7 +72,9 @@ export default async (req, res) => {
     if (response.ok && responseData.status === 'success') {
       const checkoutId = responseData.data?.checkout_id || responseData.checkout_id || externalReference;
       
-      const { error: dbError } = await supabase
+      console.log('Storing transaction with checkout_id:', checkoutId);
+      
+      const { data: insertedData, error: dbError } = await supabase
         .from('transactions')
         .insert({
           transaction_request_id: checkoutId,
@@ -82,10 +84,13 @@ export default async (req, res) => {
           reference: externalReference,
           description: description,
           payment_provider: 'swiftpay'
-        });
+        })
+        .select();
 
       if (dbError) {
         console.error('Database insert error:', dbError);
+      } else {
+        console.log('Transaction stored successfully:', insertedData);
       }
 
       return res.status(200).json({
