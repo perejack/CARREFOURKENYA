@@ -28,13 +28,12 @@ export default async (req, res) => {
       });
     }
     
-    console.log('Checking status for reference:', transaction_request_id);
+    console.log('Checking status for checkout_id:', transaction_request_id);
     
-    const { data: transaction, error: dbError } = await supabase
+    const { data: transactions, error: dbError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('transaction_request_id', transaction_request_id)
-      .maybeSingle();
+      .filter('mpesa_response->CheckoutRequestID', 'eq', transaction_request_id);
     
     if (dbError) {
       console.error('Database query error:', dbError);
@@ -44,6 +43,8 @@ export default async (req, res) => {
         error: dbError.message || String(dbError)
       });
     }
+    
+    const transaction = transactions && transactions.length > 0 ? transactions[0] : null;
     
     if (transaction) {
       console.log(`Payment status found for ${transaction_request_id}:`, transaction);
@@ -60,10 +61,10 @@ export default async (req, res) => {
         payment: {
           status: paymentStatus,
           amount: transaction.amount,
-          phoneNumber: transaction.phone,
-          mpesaReceiptNumber: transaction.receipt_number,
-          resultDesc: transaction.result_description,
-          resultCode: transaction.result_code,
+          phoneNumber: transaction.phone_number,
+          mpesaReceiptNumber: transaction.mpesa_response?.MpesaReceiptNumber,
+          resultDesc: transaction.mpesa_response?.ResultDesc,
+          resultCode: transaction.mpesa_response?.ResultCode,
           timestamp: transaction.updated_at
         }
       });

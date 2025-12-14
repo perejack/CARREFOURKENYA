@@ -80,13 +80,20 @@ export default async (req, res) => {
       const { data: insertedData, error: dbError } = await supabase
         .from('transactions')
         .insert({
-          transaction_request_id: checkoutId,
+          till_id: SWIFTPAY_TILL_ID,
+          phone_number: normalizedPhone,
+          amount: amount.toString(),
+          currency: 'KES',
           status: 'pending',
-          amount: amount,
-          phone: normalizedPhone,
+          transaction_type: 'stk_push',
           reference: externalReference,
           description: description,
-          payment_provider: 'swiftpay'
+          mpesa_response: {
+            CheckoutRequestID: checkoutId,
+            ResponseCode: '0',
+            CustomerMessage: 'STK Push sent successfully',
+            ResponseDescription: 'Success. Request accepted for processing'
+          }
         })
         .select();
 

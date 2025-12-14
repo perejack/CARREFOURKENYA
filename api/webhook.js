@@ -28,21 +28,21 @@ export default async function handler(req, res) {
     
     const payload = req.body;
     
-    let transactionId = payload.transaction_request_id || payload.checkoutRequestId || payload.reference;
-    let paymentStatus = payload.status || payload.payment_status || 'pending';
-    let receiptNumber = payload.receipt_number || payload.mpesaReceiptNumber || null;
-    let resultCode = payload.result_code || payload.resultCode || null;
-    let resultDescription = payload.result_description || payload.resultDesc || null;
+    let checkoutId = payload.CheckoutRequestID || payload.checkout_id || payload.checkoutRequestId;
+    let paymentStatus = payload.ResultCode === '0' ? 'success' : (payload.ResultCode ? 'failed' : 'pending');
+    let receiptNumber = payload.MpesaReceiptNumber || null;
+    let resultCode = payload.ResultCode || null;
+    let resultDescription = payload.ResultDesc || null;
 
-    if (!transactionId) {
-      console.error('Missing transaction identifier in webhook payload');
+    if (!checkoutId) {
+      console.error('Missing CheckoutRequestID in webhook payload');
       return res.status(400).json({
         success: false,
-        message: 'Missing transaction identifier'
+        message: 'Missing CheckoutRequestID'
       });
     }
 
-    console.log(`Processing webhook for transaction ${transactionId} with status ${paymentStatus}`);
+    console.log(`Processing webhook for checkout ${checkoutId} with status ${paymentStatus}`);
 
     // Map various status formats to standard status
     let normalizedStatus = 'pending';
@@ -56,28 +56,27 @@ export default async function handler(req, res) {
 
     console.log(`Normalized status: ${normalizedStatus}`);
 
-    // Update transaction in database
+    // Update transaction in database - find by CheckoutRequestID in mpesa_response JSON
     const updateData = {
       status: normalizedStatus,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
+      callback_data: payload
     };
 
     if (receiptNumber) {
-      updateData.receipt_number = receiptNumber;
-    }
-    if (resultCode) {
-      updateData.result_code = resultCode;
-    }
-    if (resultDescription) {
-      updateData.result_description = resultDescription;
+      updateData.mpesa_response = {
+        MpesaReceiptNumber: receiptNumber,
+        ResultCode: resultCode,
+        ResultDesc: resultDescription
+      };
     }
 
-    console.log(`Attempting to update transaction ${transactionId} with data:`, updateData);
+    console.log(`Attempting to update transaction with checkout ${checkoutId} and data:`, updateData);
 
     const { data: updatedData, error } = await supabase
       .from('transactions')
       .update(updateData)
-      .eq('transaction_request_id', transactionId)
+      .filter('mpesa_response->CheckoutRequestID', 'eq', checkoutId)
       .select();
 
     if (error) {
@@ -88,13 +87,13 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`Transaction ${transactionId} updated successfully:`, updatedData);
+    console.log(`Transaction ${checkoutId} updated successfully:`, updatedData);
     console.log(`=== WEBHOOK PROCESSED SUCCESSFULLY ===`);
 
     return res.status(200).json({
       success: true,
       message: 'Webhook processed successfully',
-      transactionId: transactionId,
+      checkoutId: checkoutId,
       status: normalizedStatus
     });
   } catch (error) {
