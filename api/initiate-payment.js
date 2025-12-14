@@ -70,10 +70,12 @@ export default async (req, res) => {
     const responseData = await response.json();
 
     if (response.ok && responseData.status === 'success') {
+      const checkoutId = responseData.data?.checkout_id || responseData.checkout_id || externalReference;
+      
       const { error: dbError } = await supabase
         .from('transactions')
         .insert({
-          transaction_request_id: responseData.checkoutRequestId || externalReference,
+          transaction_request_id: checkoutId,
           status: 'pending',
           amount: amount,
           phone: normalizedPhone,
@@ -90,8 +92,9 @@ export default async (req, res) => {
         success: true,
         message: 'Payment initiated successfully',
         data: {
-          externalReference: responseData.checkoutRequestId || externalReference,
-          checkoutRequestId: responseData.checkoutRequestId || externalReference
+          requestId: checkoutId,
+          checkoutId: checkoutId,
+          externalReference: externalReference
         }
       });
     } else {
