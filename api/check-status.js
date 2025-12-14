@@ -5,6 +5,33 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// M-Pesa Configuration
+const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY || '';
+const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
+const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORTCODE || '';
+const MPESA_PASSKEY = process.env.MPESA_PASSKEY || '';
+
+// Get OAuth token from Safaricom
+async function getMpesaToken() {
+  try {
+    const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
+    
+    const response = await fetch('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const data = await response.json();
+    return data.access_token || null;
+  } catch (error) {
+    console.error('Error getting M-Pesa token:', error);
+    return null;
+  }
+}
+
 export default async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -58,6 +85,61 @@ export default async (req, res) => {
         paymentStatus = 'success';
       } else if (transaction.status === 'failed' || transaction.status === 'cancelled') {
         paymentStatus = 'failed';
+      }
+      
+      // If status is still pending, query Safaricom M-Pesa API as fallback
+      if (paymentStatus === 'pending') {
+        console.log(`Status is pending, querying Safaricom M-Pesa API for ${transaction_request_id}`);
+        try {
+          const token = await getMpesaToken();
+          if (token) {
+            const timestamp = new Date().toISOString().replace(/[:-]/g, '').split('.')[0];
+            const password = Buffer.from(`${MPESA_BUSINESS_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
+            
+            const safaricomResponse = await fetch('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify({
+                BusinessShortCode: MPESA_BUSINESS_SHORTCODE,
+                CheckoutRequestID: transaction_request_id,
+                Timestamp: timestamp,
+                Password: password
+              })
+            });
+
+            const safaricomData = await safaricomResponse.json();
+            console.log('Safaricom M-Pesa query response:', JSON.stringify(safaricomData, null, 2));
+            
+            if (safaricomResponse.ok && safaricomData.ResultCode === '0') {
+              console.log(`Safaricom confirmed payment success for ${transaction_request_id}, updating database`);
+              
+              // Update transaction to success
+              const { error: updateError } = await supabase
+                .from('transactions')
+                .update({
+                  status: 'success',
+                  mpesa_response: {
+                    ...(transaction.mpesa_response || {}),
+                    MpesaReceiptNumber: safaricomData.MpesaReceiptNumber,
+                    ResultCode: safaricomData.ResultCode,
+                    ResultDesc: safaricomData.ResultDesc
+                  }
+                })
+                .eq('id', transaction.id);
+              
+              if (!updateError) {
+                paymentStatus = 'success';
+                console.log(`Transaction ${transaction_request_id} updated to success`);
+              }
+            }
+          }
+        } catch (safaricomError) {
+          console.error('Error querying Safaricom M-Pesa:', safaricomError);
+          // Continue with local status if Safaricom query fails
+        }
       }
       
       return res.status(200).json({
