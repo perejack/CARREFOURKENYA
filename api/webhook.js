@@ -8,13 +8,33 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  if (req.method !== 'POST') {
+  // Test endpoint to manually trigger webhook for debugging
+  if (req.method === 'GET') {
+    console.log('=== WEBHOOK TEST ENDPOINT ===');
+    console.log('Query params:', req.query);
+    
+    const testCheckoutId = req.query.checkout_id || 'ws_CO_14122025170125069795704273';
+    
+    // Create a test payload
+    req.body = {
+      CheckoutRequestID: testCheckoutId,
+      ResultCode: '0',
+      ResultDesc: 'The service request has been processed successfully.',
+      MpesaReceiptNumber: 'TEST123456',
+      TransactionDate: new Date().toISOString(),
+      PhoneNumber: '254795704273'
+    };
+    
+    console.log('Test payload created:', req.body);
+  }
+
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return res.status(405).json({ 
       success: false,
       message: 'Method not allowed' 
