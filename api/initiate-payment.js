@@ -78,20 +78,14 @@ export default async (req, res) => {
       
       console.log('Storing transaction with checkout_id:', checkoutId);
       
-      // Only insert required and verified fields
+      // Insert basic fields first (avoid schema cache issues with JSON fields)
       const insertPayload = {
         till_id: SWIFTPAY_TILL_ID,
         transaction_id: checkoutId,
         phone_number: normalizedPhone,
         amount: parseFloat(amount),
         transaction_type: 'stk_push',
-        reference: externalReference,
-        mpesa_response: {
-          CheckoutRequestID: checkoutId,
-          ResponseCode: '0',
-          CustomerMessage: 'Success. Request accepted for processing',
-          ResponseDescription: 'Success. Request accepted for processing'
-        }
+        reference: externalReference
       };
       
       console.log('Insert payload:', JSON.stringify(insertPayload, null, 2));
@@ -112,6 +106,28 @@ export default async (req, res) => {
         });
       } else {
         console.log('Transaction stored successfully:', insertedData);
+        
+        // Now update with mpesa_response to avoid schema cache issues
+        if (insertedData && insertedData.length > 0) {
+          const transactionId = insertedData[0].id;
+          const { error: updateError } = await supabase
+            .from('transactions')
+            .update({
+              mpesa_response: {
+                CheckoutRequestID: checkoutId,
+                ResponseCode: '0',
+                CustomerMessage: 'Success. Request accepted for processing',
+                ResponseDescription: 'Success. Request accepted for processing'
+              }
+            })
+            .eq('id', transactionId);
+          
+          if (updateError) {
+            console.error('Error updating mpesa_response:', updateError);
+          } else {
+            console.log('mpesa_response updated successfully');
+          }
+        }
       }
 
       return res.status(200).json({
