@@ -99,22 +99,11 @@ export default async function handler(req, res) {
       });
     }
 
-    // Update transaction in database
+    // Update transaction in database - start with just status
     const updateData = {
       status: normalizedStatus,
-      updated_at: new Date().toISOString(),
-      callback_data: payload
+      updated_at: new Date().toISOString()
     };
-
-    if (receiptNumber) {
-      // Merge with existing mpesa_response to preserve CheckoutRequestID
-      updateData.mpesa_response = {
-        ...(transactionToUpdate.mpesa_response || {}),
-        MpesaReceiptNumber: receiptNumber,
-        ResultCode: resultCode,
-        ResultDesc: resultDescription
-      };
-    }
 
     console.log(`Attempting to update transaction ${transactionToUpdate.id} with checkout ${checkoutId} and data:`, updateData);
 
@@ -126,11 +115,35 @@ export default async function handler(req, res) {
       .select();
 
     if (error) {
-      console.error('Database error:', error);
+      console.error('Database error - code:', error.code);
+      console.error('Database error - message:', error.message);
+      console.error('Full error:', JSON.stringify(error, null, 2));
       return res.status(500).json({
         success: false,
-        message: 'Error updating transaction'
+        message: 'Error updating transaction',
+        error: error.message
       });
+    }
+    
+    // Now update mpesa_response if we have receipt details
+    if (receiptNumber && updatedData && updatedData.length > 0) {
+      const { error: updateError } = await supabase
+        .from('transactions')
+        .update({
+          mpesa_response: {
+            ...(transactionToUpdate.mpesa_response || {}),
+            MpesaReceiptNumber: receiptNumber,
+            ResultCode: resultCode,
+            ResultDesc: resultDescription
+          }
+        })
+        .eq('id', transactionToUpdate.id);
+      
+      if (updateError) {
+        console.error('Error updating mpesa_response:', updateError);
+      } else {
+        console.log('mpesa_response updated successfully');
+      }
     }
 
     console.log(`Transaction ${checkoutId} updated successfully:`, updatedData);
