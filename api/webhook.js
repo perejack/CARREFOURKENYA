@@ -73,10 +73,37 @@ export default async function handler(req, res) {
 
     console.log(`Attempting to update transaction with checkout ${checkoutId} and data:`, updateData);
 
+    // First, find the transaction by CheckoutRequestID
+    const { data: allTransactions, error: findError } = await supabase
+      .from('transactions')
+      .select('id')
+      .limit(100);
+
+    if (findError) {
+      console.error('Error fetching transactions:', findError);
+      return res.status(500).json({
+        success: false,
+        message: 'Error finding transaction'
+      });
+    }
+
+    const transactionToUpdate = allTransactions?.find(t => 
+      t.mpesa_response?.CheckoutRequestID === checkoutId
+    );
+
+    if (!transactionToUpdate) {
+      console.error(`Transaction not found for checkout ${checkoutId}`);
+      return res.status(404).json({
+        success: false,
+        message: 'Transaction not found'
+      });
+    }
+
+    // Update the transaction by ID
     const { data: updatedData, error } = await supabase
       .from('transactions')
       .update(updateData)
-      .filter('mpesa_response->CheckoutRequestID', 'eq', checkoutId)
+      .eq('id', transactionToUpdate.id)
       .select();
 
     if (error) {

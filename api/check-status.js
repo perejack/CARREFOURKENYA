@@ -30,10 +30,11 @@ export default async (req, res) => {
     
     console.log('Checking status for checkout_id:', transaction_request_id);
     
-    const { data: transactions, error: dbError } = await supabase
+    const { data: allTransactions, error: dbError } = await supabase
       .from('transactions')
       .select('*')
-      .filter('mpesa_response->CheckoutRequestID', 'eq', transaction_request_id);
+      .order('created_at', { ascending: false })
+      .limit(100);
     
     if (dbError) {
       console.error('Database query error:', dbError);
@@ -44,7 +45,10 @@ export default async (req, res) => {
       });
     }
     
-    const transaction = transactions && transactions.length > 0 ? transactions[0] : null;
+    // Find transaction by CheckoutRequestID in mpesa_response JSON
+    const transaction = allTransactions?.find(t => 
+      t.mpesa_response?.CheckoutRequestID === transaction_request_id
+    ) || null;
     
     if (transaction) {
       console.log(`Payment status found for ${transaction_request_id}:`, transaction);
