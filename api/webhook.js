@@ -99,24 +99,20 @@ export default async function handler(req, res) {
       });
     }
 
-    // Update transaction in database - start with just status
-    const updateData = {
-      status: normalizedStatus,
-      updated_at: new Date().toISOString()
-    };
-
-    console.log(`Attempting to update transaction ${transactionToUpdate.id} with checkout ${checkoutId} and data:`, updateData);
+    // Update transaction in database - just status
+    console.log(`Attempting to update transaction ${transactionToUpdate.id} with status: ${normalizedStatus}`);
 
     // Update the transaction by ID
     const { data: updatedData, error } = await supabase
       .from('transactions')
-      .update(updateData)
+      .update({ status: normalizedStatus })
       .eq('id', transactionToUpdate.id)
       .select();
 
     if (error) {
       console.error('Database error - code:', error.code);
       console.error('Database error - message:', error.message);
+      console.error('Database error - details:', error.details);
       console.error('Full error:', JSON.stringify(error, null, 2));
       return res.status(500).json({
         success: false,
