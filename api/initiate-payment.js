@@ -83,7 +83,7 @@ export default async (req, res) => {
         .insert({
           till_id: SWIFTPAY_TILL_ID,
           phone_number: normalizedPhone,
-          amount: amount.toString(),
+          amount: parseFloat(amount),
           currency: 'KES',
           status: 'pending',
           transaction_type: 'stk_push',
@@ -92,7 +92,7 @@ export default async (req, res) => {
           mpesa_response: {
             CheckoutRequestID: checkoutId,
             ResponseCode: '0',
-            CustomerMessage: 'STK Push sent successfully',
+            CustomerMessage: 'Success. Request accepted for processing',
             ResponseDescription: 'Success. Request accepted for processing'
           }
         })
