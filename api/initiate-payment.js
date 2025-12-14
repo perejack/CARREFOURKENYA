@@ -78,48 +78,38 @@ export default async (req, res) => {
       
       console.log('Storing transaction with checkout_id:', checkoutId);
       
-      // Use raw SQL to bypass schema cache issues
-      const { data: insertedData, error: dbError } = await supabase.rpc('insert_transaction', {
-        p_till_id: SWIFTPAY_TILL_ID,
-        p_transaction_id: checkoutId,
-        p_phone_number: normalizedPhone,
-        p_amount: parseFloat(amount),
-        p_transaction_type: 'stk_push',
-        p_reference: externalReference,
-        p_mpesa_response: JSON.stringify({
-          CheckoutRequestID: checkoutId,
-          ResponseCode: '0',
-          CustomerMessage: 'Success. Request accepted for processing',
-          ResponseDescription: 'Success. Request accepted for processing'
+      // Insert with minimal fields - just transaction_id which is the key field
+      console.log('Attempting insert with transaction_id:', checkoutId);
+      const { data: insertedData, error: dbError } = await supabase
+        .from('transactions')
+        .insert({
+          transaction_id: checkoutId
         })
-      });
+        .select();
 
       if (dbError) {
-        console.error('Database insert error - code:', dbError.code);
-        console.error('Database insert error - message:', dbError.message);
-        console.error('Full error:', JSON.stringify(dbError, null, 2));
+        console.error('Insert failed - code:', dbError.code);
+        console.error('Insert failed - message:', dbError.message);
         
-        // Fallback: Try direct insert without mpesa_response
-        console.log('Attempting fallback insert without mpesa_response...');
-        const { data: fallbackData, error: fallbackError } = await supabase
+        // Try with amount as well
+        console.log('Retrying with transaction_id and amount...');
+        const { data: retryData, error: retryError } = await supabase
           .from('transactions')
           .insert({
-            till_id: SWIFTPAY_TILL_ID,
             transaction_id: checkoutId,
-            amount: parseFloat(amount),
-            status: 'pending'
+            amount: parseFloat(amount)
           })
           .select();
         
-        if (fallbackError) {
-          console.error('Fallback insert also failed:', fallbackError);
+        if (retryError) {
+          console.error('Retry also failed:', retryError.message);
           return res.status(500).json({
             success: false,
             message: 'Failed to store transaction',
-            error: fallbackError.message
+            error: retryError.message
           });
         } else {
-          console.log('Fallback insert successful:', fallbackData);
+          console.log('Retry insert successful:', retryData);
         }
       } else {
         console.log('Transaction stored successfully:', insertedData);
