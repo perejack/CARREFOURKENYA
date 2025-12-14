@@ -85,7 +85,6 @@ export default async (req, res) => {
           transaction_id: checkoutId,
           phone_number: normalizedPhone,
           amount: parseFloat(amount),
-          status: 'pending',
           transaction_type: 'stk_push',
           reference: externalReference,
           description: description,
@@ -99,7 +98,14 @@ export default async (req, res) => {
         .select();
 
       if (dbError) {
-        console.error('Database insert error:', dbError);
+        console.error('Database insert error - code:', dbError.code);
+        console.error('Database insert error - message:', dbError.message);
+        console.error('Full error:', JSON.stringify(dbError, null, 2));
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to store transaction',
+          error: dbError.message
+        });
       } else {
         console.log('Transaction stored successfully:', insertedData);
       }
