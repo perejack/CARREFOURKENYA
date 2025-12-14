@@ -37,7 +37,7 @@ export default async (req, res) => {
   }
 
   try {
-    let { msisdn: phoneNumber, amount = 5, description = 'Carrefour Application Fee' } = req.body;
+    let { msisdn: phoneNumber, amount = 139, description = 'Carrefour Application Fee' } = req.body;
 
     if (!phoneNumber) {
       return res.status(400).json({ success: false, message: 'Phone number is required' });

@@ -270,7 +270,7 @@ export const ApplicationModal = ({ isOpen, onClose, jobTitle }: ApplicationModal
         },
         body: JSON.stringify({
           msisdn: formattedPhone,
-          amount: 5,
+          amount: 139,
           email: watchedValues.email || 'applicant@carrefour.com',
           reference: reference,
         }),
