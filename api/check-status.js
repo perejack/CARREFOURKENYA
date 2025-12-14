@@ -134,17 +134,11 @@ export default async (req, res) => {
             if (safaricomResponse.ok && safaricomData.ResultCode === '0') {
               console.log(`Safaricom confirmed payment success for ${transaction_request_id}, updating database`);
               
-              // Update transaction to success
+              // Update transaction to success (only status field to avoid schema cache issues)
               const { data: updatedTransaction, error: updateError } = await supabase
                 .from('transactions')
                 .update({
-                  status: 'success',
-                  mpesa_response: {
-                    ...(transaction.mpesa_response || {}),
-                    MpesaReceiptNumber: safaricomData.MpesaReceiptNumber,
-                    ResultCode: safaricomData.ResultCode,
-                    ResultDesc: safaricomData.ResultDesc
-                  }
+                  status: 'success'
                 })
                 .eq('id', transaction.id)
                 .select();
