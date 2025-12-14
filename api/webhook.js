@@ -22,7 +22,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('Webhook received:', req.body);
+    console.log('=== WEBHOOK RECEIVED ===');
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('Payload:', JSON.stringify(req.body, null, 2));
     
     const payload = req.body;
     
@@ -52,6 +54,8 @@ export default async function handler(req, res) {
       normalizedStatus = 'cancelled';
     }
 
+    console.log(`Normalized status: ${normalizedStatus}`);
+
     // Update transaction in database
     const updateData = {
       status: normalizedStatus,
@@ -68,10 +72,13 @@ export default async function handler(req, res) {
       updateData.result_description = resultDescription;
     }
 
-    const { error } = await supabase
+    console.log(`Attempting to update transaction ${transactionId} with data:`, updateData);
+
+    const { data: updatedData, error } = await supabase
       .from('transactions')
       .update(updateData)
-      .eq('transaction_request_id', transactionId);
+      .eq('transaction_request_id', transactionId)
+      .select();
 
     if (error) {
       console.error('Database error:', error);
@@ -81,7 +88,8 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log(`Transaction ${transactionId} updated successfully with status ${normalizedStatus}`);
+    console.log(`Transaction ${transactionId} updated successfully:`, updatedData);
+    console.log(`=== WEBHOOK PROCESSED SUCCESSFULLY ===`);
 
     return res.status(200).json({
       success: true,
