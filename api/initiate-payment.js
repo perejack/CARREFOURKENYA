@@ -68,6 +68,9 @@ export default async (req, res) => {
     });
 
     const responseData = await response.json();
+    
+    console.log('SwiftPay response status:', response.status);
+    console.log('SwiftPay response data:', JSON.stringify(responseData, null, 2));
 
     if (response.ok && responseData.status === 'success') {
       const checkoutId = responseData.data?.checkout_id || responseData.checkout_id || externalReference;
