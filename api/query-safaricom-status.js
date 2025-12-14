@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // M-Pesa Configuration
 const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY || '';
 const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
-const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORTCODE || '';
+const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORT_CODE || process.env.MPESA_BUSINESS_SHORTCODE || '';
 const MPESA_PASSKEY = process.env.MPESA_PASSKEY || '';
 
 // Get OAuth token from Safaricom

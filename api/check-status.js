@@ -8,12 +8,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // M-Pesa Configuration
 const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY || '';
 const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
-const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORTCODE || '';
+const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORT_CODE || process.env.MPESA_BUSINESS_SHORTCODE || '';
 const MPESA_PASSKEY = process.env.MPESA_PASSKEY || '';
 
 // Get OAuth token from Safaricom
 async function getMpesaToken() {
   try {
+    if (!MPESA_CONSUMER_KEY || !MPESA_CONSUMER_SECRET) {
+      console.error('M-Pesa credentials not configured');
+      return null;
+    }
+    
     const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
     
     const response = await fetch('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
@@ -24,10 +29,17 @@ async function getMpesaToken() {
       }
     });
 
+    if (!response.ok) {
+      console.error('M-Pesa token response status:', response.status);
+      const text = await response.text();
+      console.error('M-Pesa token response:', text);
+      return null;
+    }
+
     const data = await response.json();
     return data.access_token || null;
   } catch (error) {
-    console.error('Error getting M-Pesa token:', error);
+    console.error('Error getting M-Pesa token:', error.message);
     return null;
   }
 }
