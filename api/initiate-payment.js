@@ -78,39 +78,24 @@ export default async (req, res) => {
       
       console.log('Storing transaction with checkout_id:', checkoutId);
       
-      // Insert with minimal fields - just transaction_id which is the key field
-      console.log('Attempting insert with transaction_id:', checkoutId);
+      // Insert with transaction_request_id (the correct column name)
+      console.log('Attempting insert with transaction_request_id:', checkoutId);
       const { data: insertedData, error: dbError } = await supabase
         .from('transactions')
         .insert({
-          transaction_id: checkoutId
+          transaction_request_id: checkoutId,
+          amount: parseFloat(amount)
         })
         .select();
 
       if (dbError) {
         console.error('Insert failed - code:', dbError.code);
         console.error('Insert failed - message:', dbError.message);
-        
-        // Try with amount as well
-        console.log('Retrying with transaction_id and amount...');
-        const { data: retryData, error: retryError } = await supabase
-          .from('transactions')
-          .insert({
-            transaction_id: checkoutId,
-            amount: parseFloat(amount)
-          })
-          .select();
-        
-        if (retryError) {
-          console.error('Retry also failed:', retryError.message);
-          return res.status(500).json({
-            success: false,
-            message: 'Failed to store transaction',
-            error: retryError.message
-          });
-        } else {
-          console.log('Retry insert successful:', retryData);
-        }
+        return res.status(500).json({
+          success: false,
+          message: 'Failed to store transaction',
+          error: dbError.message
+        });
       } else {
         console.log('Transaction stored successfully:', insertedData);
       }

@@ -28,12 +28,12 @@ export default async (req, res) => {
       });
     }
     
-    console.log('Checking status for transaction_id:', transaction_request_id);
+    console.log('Checking status for transaction_request_id:', transaction_request_id);
     
     const { data: transaction, error: dbError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('transaction_id', transaction_request_id)
+      .eq('transaction_request_id', transaction_request_id)
       .maybeSingle();
     
     if (dbError) {

@@ -76,11 +76,11 @@ export default async function handler(req, res) {
 
     console.log(`Normalized status: ${normalizedStatus}`);
 
-    // Find transaction by transaction_id (CheckoutRequestID)
+    // Find transaction by transaction_request_id (CheckoutRequestID)
     const { data: transactionToUpdate, error: findError } = await supabase
       .from('transactions')
       .select('*')
-      .eq('transaction_id', checkoutId)
+      .eq('transaction_request_id', checkoutId)
       .maybeSingle();
 
     if (findError) {
