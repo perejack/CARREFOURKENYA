@@ -49,7 +49,7 @@ export default async (req, res) => {
       console.log(`Payment status found for ${transaction_request_id}:`, transaction);
       
       let paymentStatus = 'pending';
-      if (transaction.status === 'success') {
+      if (transaction.status === 'success' || transaction.status === 'completed') {
         paymentStatus = 'success';
       } else if (transaction.status === 'failed' || transaction.status === 'cancelled') {
         paymentStatus = 'failed';
