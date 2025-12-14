@@ -82,9 +82,9 @@ export default async (req, res) => {
         .from('transactions')
         .insert({
           till_id: SWIFTPAY_TILL_ID,
+          transaction_id: checkoutId,
           phone_number: normalizedPhone,
           amount: parseFloat(amount),
-          currency: 'KES',
           status: 'pending',
           transaction_type: 'stk_push',
           reference: externalReference,

@@ -28,13 +28,13 @@ export default async (req, res) => {
       });
     }
     
-    console.log('Checking status for checkout_id:', transaction_request_id);
+    console.log('Checking status for transaction_id:', transaction_request_id);
     
-    const { data: allTransactions, error: dbError } = await supabase
+    const { data: transaction, error: dbError } = await supabase
       .from('transactions')
       .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100);
+      .eq('transaction_id', transaction_request_id)
+      .maybeSingle();
     
     if (dbError) {
       console.error('Database query error:', dbError);
@@ -45,20 +45,10 @@ export default async (req, res) => {
       });
     }
     
-    console.log('Total transactions fetched:', allTransactions?.length);
-    console.log('Looking for CheckoutRequestID:', transaction_request_id);
-    
-    // Log all transactions to see what we have
-    if (allTransactions && allTransactions.length > 0) {
-      console.log('Sample transaction mpesa_response:', JSON.stringify(allTransactions[0].mpesa_response, null, 2));
+    console.log('Transaction found:', transaction ? 'YES' : 'NO');
+    if (transaction) {
+      console.log('Transaction status:', transaction.status);
     }
-    
-    // Find transaction by CheckoutRequestID in mpesa_response JSON
-    const transaction = allTransactions?.find(t => {
-      const checkoutId = t.mpesa_response?.CheckoutRequestID;
-      console.log(`Comparing: "${checkoutId}" === "${transaction_request_id}" ? ${checkoutId === transaction_request_id}`);
-      return checkoutId === transaction_request_id;
-    }) || null;
     
     if (transaction) {
       console.log(`Payment status found for ${transaction_request_id}:`, transaction);
