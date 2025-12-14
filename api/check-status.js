@@ -5,41 +5,38 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// M-Pesa Configuration
-const MPESA_CONSUMER_KEY = process.env.MPESA_CONSUMER_KEY || '';
-const MPESA_CONSUMER_SECRET = process.env.MPESA_CONSUMER_SECRET || '';
-const MPESA_BUSINESS_SHORTCODE = process.env.MPESA_BUSINESS_SHORT_CODE || process.env.MPESA_BUSINESS_SHORTCODE || '';
-const MPESA_PASSKEY = process.env.MPESA_PASSKEY || '';
+// SwiftPay M-Pesa Verification Proxy
+const MPESA_PROXY_URL = process.env.MPESA_PROXY_URL || 'https://swiftpay-backend-uvv9.onrender.com/api/mpesa-verification-proxy';
+const MPESA_PROXY_API_KEY = process.env.MPESA_PROXY_API_KEY || '';
 
-// Get OAuth token from Safaricom
-async function getMpesaToken() {
+// Query M-Pesa payment status via SwiftPay proxy (no credentials needed)
+async function queryMpesaPaymentStatus(checkoutId) {
   try {
-    if (!MPESA_CONSUMER_KEY || !MPESA_CONSUMER_SECRET) {
-      console.error('M-Pesa credentials not configured');
-      return null;
-    }
+    console.log(`Querying M-Pesa status for ${checkoutId} via proxy`);
     
-    const auth = Buffer.from(`${MPESA_CONSUMER_KEY}:${MPESA_CONSUMER_SECRET}`).toString('base64');
-    
-    const response = await fetch('https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials', {
-      method: 'GET',
+    const response = await fetch(MPESA_PROXY_URL, {
+      method: 'POST',
       headers: {
-        'Authorization': `Basic ${auth}`,
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        checkoutId: checkoutId,
+        apiKey: MPESA_PROXY_API_KEY
+      })
     });
 
     if (!response.ok) {
-      console.error('M-Pesa token response status:', response.status);
+      console.error('Proxy response status:', response.status);
       const text = await response.text();
-      console.error('M-Pesa token response:', text);
+      console.error('Proxy response:', text);
       return null;
     }
 
     const data = await response.json();
-    return data.access_token || null;
+    console.log('Proxy response:', JSON.stringify(data, null, 2));
+    return data;
   } catch (error) {
-    console.error('Error getting M-Pesa token:', error.message);
+    console.error('Error querying M-Pesa via proxy:', error.message);
     return null;
   }
 }
@@ -99,61 +96,37 @@ export default async (req, res) => {
         paymentStatus = 'failed';
       }
       
-      // If status is still pending, query Safaricom M-Pesa API as fallback
+      // If status is still pending, query M-Pesa via SwiftPay proxy
       if (paymentStatus === 'pending') {
-        console.log(`Status is pending, querying Safaricom M-Pesa API for ${transaction_request_id}`);
+        console.log(`Status is pending, querying M-Pesa via proxy for ${transaction_request_id}`);
         try {
-          const token = await getMpesaToken();
-          if (token) {
-            const now = new Date();
-            const timestamp = now.getFullYear().toString() + 
-              String(now.getMonth() + 1).padStart(2, '0') + 
-              String(now.getDate()).padStart(2, '0') + 
-              String(now.getHours()).padStart(2, '0') + 
-              String(now.getMinutes()).padStart(2, '0') + 
-              String(now.getSeconds()).padStart(2, '0');
-            const password = Buffer.from(`${MPESA_BUSINESS_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
+          const proxyResponse = await queryMpesaPaymentStatus(transaction_request_id);
+          
+          if (proxyResponse && proxyResponse.success && proxyResponse.payment.status === 'success') {
+            console.log(`Proxy confirmed payment success for ${transaction_request_id}, updating database`);
             
-            const safaricomResponse = await fetch('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({
-                BusinessShortCode: MPESA_BUSINESS_SHORTCODE,
-                CheckoutRequestID: transaction_request_id,
-                Timestamp: timestamp,
-                Password: password
+            // Update transaction to success
+            const { data: updatedTransaction, error: updateError } = await supabase
+              .from('transactions')
+              .update({
+                status: 'success'
               })
-            });
-
-            const safaricomData = await safaricomResponse.json();
-            console.log('Safaricom M-Pesa query response:', JSON.stringify(safaricomData, null, 2));
+              .eq('id', transaction.id)
+              .select();
             
-            if (safaricomResponse.ok && safaricomData.ResultCode === '0') {
-              console.log(`Safaricom confirmed payment success for ${transaction_request_id}, updating database`);
-              
-              // Update transaction to success (only status field to avoid schema cache issues)
-              const { data: updatedTransaction, error: updateError } = await supabase
-                .from('transactions')
-                .update({
-                  status: 'success'
-                })
-                .eq('id', transaction.id)
-                .select();
-              
-              if (!updateError && updatedTransaction && updatedTransaction.length > 0) {
-                paymentStatus = 'success';
-                console.log(`Transaction ${transaction_request_id} updated to success:`, updatedTransaction[0]);
-              } else if (updateError) {
-                console.error('Error updating transaction:', updateError);
-              }
+            if (!updateError && updatedTransaction && updatedTransaction.length > 0) {
+              paymentStatus = 'success';
+              console.log(`Transaction ${transaction_request_id} updated to success:`, updatedTransaction[0]);
+            } else if (updateError) {
+              console.error('Error updating transaction:', updateError);
             }
+          } else if (proxyResponse && proxyResponse.payment.status === 'failed') {
+            paymentStatus = 'failed';
+            console.log(`Proxy confirmed payment failed for ${transaction_request_id}`);
           }
-        } catch (safaricomError) {
-          console.error('Error querying Safaricom M-Pesa:', safaricomError);
-          // Continue with local status if Safaricom query fails
+        } catch (proxyError) {
+          console.error('Error querying M-Pesa via proxy:', proxyError);
+          // Continue with local status if proxy query fails
         }
       }
       
