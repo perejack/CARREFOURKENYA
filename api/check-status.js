@@ -135,7 +135,7 @@ export default async (req, res) => {
               console.log(`Safaricom confirmed payment success for ${transaction_request_id}, updating database`);
               
               // Update transaction to success
-              const { error: updateError } = await supabase
+              const { data: updatedTransaction, error: updateError } = await supabase
                 .from('transactions')
                 .update({
                   status: 'success',
@@ -146,11 +146,14 @@ export default async (req, res) => {
                     ResultDesc: safaricomData.ResultDesc
                   }
                 })
-                .eq('id', transaction.id);
+                .eq('id', transaction.id)
+                .select();
               
-              if (!updateError) {
+              if (!updateError && updatedTransaction && updatedTransaction.length > 0) {
                 paymentStatus = 'success';
-                console.log(`Transaction ${transaction_request_id} updated to success`);
+                console.log(`Transaction ${transaction_request_id} updated to success:`, updatedTransaction[0]);
+              } else if (updateError) {
+                console.error('Error updating transaction:', updateError);
               }
             }
           }
