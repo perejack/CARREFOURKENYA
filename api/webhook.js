@@ -76,27 +76,10 @@ export default async function handler(req, res) {
 
     console.log(`Normalized status: ${normalizedStatus}`);
 
-    // Update transaction in database - find by CheckoutRequestID in mpesa_response JSON
-    const updateData = {
-      status: normalizedStatus,
-      updated_at: new Date().toISOString(),
-      callback_data: payload
-    };
-
-    if (receiptNumber) {
-      updateData.mpesa_response = {
-        MpesaReceiptNumber: receiptNumber,
-        ResultCode: resultCode,
-        ResultDesc: resultDescription
-      };
-    }
-
-    console.log(`Attempting to update transaction with checkout ${checkoutId} and data:`, updateData);
-
     // First, find the transaction by CheckoutRequestID
     const { data: allTransactions, error: findError } = await supabase
       .from('transactions')
-      .select('id')
+      .select('*')
       .limit(100);
 
     if (findError) {
@@ -118,6 +101,25 @@ export default async function handler(req, res) {
         message: 'Transaction not found'
       });
     }
+
+    // Update transaction in database
+    const updateData = {
+      status: normalizedStatus,
+      updated_at: new Date().toISOString(),
+      callback_data: payload
+    };
+
+    if (receiptNumber) {
+      // Merge with existing mpesa_response to preserve CheckoutRequestID
+      updateData.mpesa_response = {
+        ...(transactionToUpdate.mpesa_response || {}),
+        MpesaReceiptNumber: receiptNumber,
+        ResultCode: resultCode,
+        ResultDesc: resultDescription
+      };
+    }
+
+    console.log(`Attempting to update transaction ${transactionToUpdate.id} with checkout ${checkoutId} and data:`, updateData);
 
     // Update the transaction by ID
     const { data: updatedData, error } = await supabase
