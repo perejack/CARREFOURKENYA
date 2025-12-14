@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // SwiftPay M-Pesa Verification Proxy
 const MPESA_PROXY_URL = process.env.MPESA_PROXY_URL || 'https://swiftpay-backend-uvv9.onrender.com/api/mpesa-verification-proxy';
-const MPESA_PROXY_API_KEY = process.env.MPESA_PROXY_API_KEY || '';
+const MPESA_PROXY_API_KEY = process.env.MPESA_PROXY_API_KEY || 'carrefour-app';
 
 // Query M-Pesa payment status via SwiftPay proxy (no credentials needed)
 async function queryMpesaPaymentStatus(checkoutId) {
