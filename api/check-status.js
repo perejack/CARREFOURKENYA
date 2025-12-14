@@ -105,7 +105,13 @@ export default async (req, res) => {
         try {
           const token = await getMpesaToken();
           if (token) {
-            const timestamp = new Date().toISOString().replace(/[:-]/g, '').split('.')[0];
+            const now = new Date();
+            const timestamp = now.getFullYear().toString() + 
+              String(now.getMonth() + 1).padStart(2, '0') + 
+              String(now.getDate()).padStart(2, '0') + 
+              String(now.getHours()).padStart(2, '0') + 
+              String(now.getMinutes()).padStart(2, '0') + 
+              String(now.getSeconds()).padStart(2, '0');
             const password = Buffer.from(`${MPESA_BUSINESS_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
             
             const safaricomResponse = await fetch('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', {

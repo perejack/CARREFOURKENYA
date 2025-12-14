@@ -74,6 +74,15 @@ export default async (req, res) => {
     }
     
     // Query STK Push status from Safaricom
+    const now = new Date();
+    const timestamp = now.getFullYear().toString() + 
+      String(now.getMonth() + 1).padStart(2, '0') + 
+      String(now.getDate()).padStart(2, '0') + 
+      String(now.getHours()).padStart(2, '0') + 
+      String(now.getMinutes()).padStart(2, '0') + 
+      String(now.getSeconds()).padStart(2, '0');
+    const password = Buffer.from(`${MPESA_BUSINESS_SHORTCODE}${MPESA_PASSKEY}${timestamp}`).toString('base64');
+    
     const safaricomResponse = await fetch('https://api.safaricom.co.ke/mpesa/stkpushquery/v1/query', {
       method: 'POST',
       headers: {
@@ -83,8 +92,8 @@ export default async (req, res) => {
       body: JSON.stringify({
         BusinessShortCode: MPESA_BUSINESS_SHORTCODE,
         CheckoutRequestID: checkout_id,
-        Timestamp: new Date().toISOString().replace(/[:-]/g, '').split('.')[0],
-        Password: Buffer.from(`${MPESA_BUSINESS_SHORTCODE}${MPESA_PASSKEY}${new Date().toISOString().replace(/[:-]/g, '').split('.')[0]}`).toString('base64')
+        Timestamp: timestamp,
+        Password: password
       })
     });
 
