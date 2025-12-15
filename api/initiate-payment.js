@@ -32,12 +32,19 @@ export default async (req, res) => {
     return res.status(200).send('');
   }
 
+  console.log('Received request body:', JSON.stringify(req.body, null, 2));
+
   if (req.method !== 'POST') {
     return res.status(405).json({ success: false, message: 'Method not allowed' });
   }
 
   try {
     let { msisdn: phoneNumber, amount = 139, description = 'Carrefour Application Fee' } = req.body;
+    
+    // Ensure amount is always 139 if not explicitly provided
+    if (!req.body.amount) {
+      amount = 139;
+    }
 
     if (!phoneNumber) {
       return res.status(400).json({ success: false, message: 'Phone number is required' });
