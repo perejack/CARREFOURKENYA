@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { JobCard } from "@/components/JobCard";
 import { ApplicationModal } from "@/components/ApplicationModal";
 import { jobListings } from "@/data/jobListings";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-team.jpg";
 import cashierImage from "@/assets/cashier.jpg";
 import warehouseImage from "@/assets/warehouse.jpg";
@@ -200,7 +201,23 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-8 bg-card border-t border-border">
         <div className="container mx-auto px-4 text-center text-muted-foreground">
-          <p>© 2025 Carrefour Kenya. All rights reserved.</p>
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <Link className="hover:text-foreground" to="/contact">
+                Contact
+              </Link>
+              <Link className="hover:text-foreground" to="/privacy">
+                Privacy
+              </Link>
+              <Link className="hover:text-foreground" to="/terms">
+                Terms
+              </Link>
+              <Link className="hover:text-foreground" to="/cookies">
+                Cookies
+              </Link>
+            </div>
+            <p>© 2025 Carrefour Kenya. All rights reserved.</p>
+          </div>
         </div>
       </footer>
 
