@@ -202,6 +202,118 @@ export const allBlogPosts: BlogPost[] = [
     keywords: 'retail salaries Kenya 2026, Carrefour Kenya salary, cashier salary Kenya, warehouse supervisor salary Kenya, medical allowance Kenya jobs',
     image: '/images/blog/salary-guide.jpg',
   },
+  {
+    id: 4,
+    slug: 'the-future-of-retail-logistics-in-kenya-skills-you-need-to-master-in-2026',
+    title: 'The Future of Retail Logistics in Kenya: Skills You Need to Master in 2026',
+    date: '2026-01-26',
+    author: 'Carrefour Operations Team',
+    category: 'Industry Insights',
+    summary: 'The logistics sector in Kenya is booming. Discover the essential skills and certifications required to succeed in retail supply chain management in 2026.',
+    content: `
+      <p>Kenya's logistics industry is undergoing a massive transformation. With a 36.9% growth rate in 2025, the demand for skilled professionals in supply chain management, warehousing, and distribution has never been higher. At Carrefour Kenya, we are at the forefront of this evolution, and we are looking for talent that can navigate the complexities of modern retail logistics.</p>
+
+      <h2>Key Skills for 2026</h2>
+      <ul>
+        <li><strong>Digital Inventory Management:</strong> Proficiency in WMS (Warehouse Management Systems) and real-time tracking tools.</li>
+        <li><strong>Last-Mile Delivery Optimization:</strong> Understanding urban logistics and efficient routing in cities like Nairobi and Mombasa.</li>
+        <li><strong>Sustainability in Supply Chain:</strong> Knowledge of green logistics and reducing carbon footprints in retail distribution.</li>
+      </ul>
+
+      <p>Ready to join our logistics team? <a href="/jobs/category/logistics">View Logistics Jobs</a></p>
+    `,
+    keywords: 'Logistics jobs Kenya 2026, Supply Chain trends Kenya, Carrefour logistics',
+    image: '/images/blog/logistics-future.jpg',
+  },
+  {
+    id: 5,
+    slug: 'how-to-transition-from-informal-trade-to-a-formal-retail-career-at-carrefour',
+    title: 'How to Transition from Informal Trade to a Formal Retail Career at Carrefour',
+    date: '2026-01-27',
+    author: 'Carrefour HR Team',
+    category: 'Career Advice',
+    summary: 'Moving from informal selling to a structured retail environment can be challenging. Here is your step-by-step guide to making the transition successfully.',
+    content: `
+      <p>Many of Kenya's best retail talents start in the informal sector. Whether you've managed a small stall or worked in a local shop, your skills are valuable. Carrefour Kenya values this experience and offers a clear path to formal employment, complete with benefits, medical cover, and career growth.</p>
+
+      <h2>Steps to Transition</h2>
+      <ol>
+        <li><strong>Translate Your Skills:</strong> Turn "selling at a stall" into "Customer Relationship Management" and "Inventory Control" on your CV.</li>
+        <li><strong>Understand Formal Processes:</strong> Learn about POS systems, formal reporting, and corporate health and safety standards.</li>
+        <li><strong>Highlight Your Resilience:</strong> The informal sector builds incredible problem-solving skills—showcase these during your interview.</li>
+      </ol>
+
+      <p>Start your formal career today. <a href="/#jobs">Browse Entry-Level Roles</a></p>
+    `,
+    keywords: 'Formal employment Kenya, Retail career path Kenya, informal to formal jobs',
+    image: '/images/blog/career-transition.jpg',
+  },
+  {
+    id: 6,
+    slug: 'top-5-finance-certifications-that-guarantee-a-job-in-kenyan-retail',
+    title: 'Top 5 Finance Certifications That Guarantee a Job in Kenyan Retail',
+    date: '2026-01-28',
+    author: 'Carrefour Finance Team',
+    category: 'Career Advice',
+    summary: 'Finance roles are the most sought-after in Kenya. Stand out from the crowd with these top 5 certifications preferred by major retailers.',
+    content: `
+      <p>Accountants and Cashiers remain the most in-demand roles in the Kenyan job market, making up 15% of all top-tier job advertisements. To secure a position at Carrefour Kenya, having the right certifications can give you a significant edge over other candidates.</p>
+
+      <h2>Recommended Certifications</h2>
+      <ul>
+        <li><strong>CPA (K):</strong> The gold standard for accounting in Kenya.</li>
+        <li><strong>ACCA:</strong> Globally recognized and highly valued in multinational retail environments.</li>
+        <li><strong>CIFA:</strong> Essential for those looking to move into investment and financial analysis.</li>
+        <li><strong>QuickBooks/Sage Certification:</strong> Practical skills in modern accounting software are a must.</li>
+      </ul>
+
+      <p>Apply for our finance openings. <a href="/jobs/category/finance">View Finance Jobs</a></p>
+    `,
+    keywords: 'Finance jobs Kenya, Accounting certifications Kenya, Carrefour finance careers',
+    image: '/images/blog/finance-certs.jpg',
+  },
+  {
+    id: 7,
+    slug: 'the-essential-guide-to-kenyas-manufacturing-and-fmcg-job-market-in-2026',
+    title: 'The Essential Guide to Kenya\'s Manufacturing and FMCG Job Market in 2026',
+    date: '2026-01-29',
+    author: 'Manus AI Research',
+    category: 'Industry Insights',
+    summary: 'The FMCG sector is growing at 48.2%. Learn about the new career paths opening up in manufacturing and how they link to retail.',
+    content: `
+      <p>Manufacturing and Fast-Moving Consumer Goods (FMCG) are the engines of the Kenyan economy in 2026. As these sectors grow, they create a ripple effect in retail, increasing the need for skilled merchandisers, quality control experts, and distribution managers.</p>
+
+      <h2>Growth Areas</h2>
+      <p>We are seeing massive investment in local production, which means more jobs in Nairobi, Nakuru, and Eldoret. Understanding the link between production and the retail shelf is key to a successful career in this space.</p>
+
+      <p>Explore operations roles. <a href="/jobs/category/operations">View Operations Jobs</a></p>
+    `,
+    keywords: 'Manufacturing jobs Kenya, FMCG careers Kenya, retail supply chain',
+    image: '/images/blog/fmcg-guide.jpg',
+  },
+  {
+    id: 8,
+    slug: 'carrefour-kenyas-community-impact-more-than-just-a-job',
+    title: 'Carrefour Kenya\'s Community Impact: More Than Just a Job',
+    date: '2026-01-30',
+    author: 'Carrefour CSR Team',
+    category: 'Company Culture',
+    summary: 'Discover how working at Carrefour Kenya allows you to contribute to the community through our various CSR initiatives and sustainability programs.',
+    content: `
+      <p>At Carrefour Kenya, we believe that our success is tied to the success of the communities we serve. When you join our team, you're not just getting a job; you're becoming part of a mission to improve lives across Kenya through sustainable sourcing, community support, and environmental stewardship.</p>
+
+      <h2>Our Values in Action</h2>
+      <ul>
+        <li><strong>Supporting Local Farmers:</strong> Over 90% of our fresh produce is sourced directly from Kenyan farmers.</li>
+        <li><strong>Plastic-Free Initiatives:</strong> Leading the way in reducing single-use plastics in the retail sector.</li>
+        <li><strong>Youth Empowerment:</strong> Our internship and training programs have helped thousands of young Kenyans start their careers.</li>
+      </ul>
+
+      <p>Join a company with a purpose. <a href="/#jobs">View All Openings</a></p>
+    `,
+    keywords: 'Carrefour Kenya CSR, Best companies to work for Kenya, retail values',
+    image: '/images/blog/community-impact.jpg',
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string): BlogPost | undefined => {
