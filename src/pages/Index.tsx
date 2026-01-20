@@ -1,4 +1,5 @@
 import { useState } from "react";
+import OrganizationSchema from "@/components/OrganizationSchema";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { JobCard } from "@/components/JobCard";
@@ -65,6 +66,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <OrganizationSchema />
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
         <div 
@@ -130,17 +132,28 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {jobsWithImages.map((job) => (
-              <JobCard
-                key={job.id}
-                title={job.title}
-                salary={job.salary}
-                medical={job.medical}
-                category={job.category}
-                image={job.image}
-                onApply={() => handleApply(job.title)}
-              />
-            ))}
+            {jobsWithImages.map((job) => {
+              const slug = job.title.toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/&/g, '')
+                .replace(/--+/g, '-');
+              return (
+                <Link key={job.id} to={`/jobs/${slug}`}>
+                  <JobCard
+                    title={job.title}
+                    salary={job.salary}
+                    medical={job.medical}
+                    category={job.category}
+                    image={job.image}
+                    onApply={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleApply(job.title);
+                    }}
+                  />
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -203,6 +216,9 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center text-muted-foreground">
           <div className="flex flex-col items-center gap-4">
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <Link className="hover:text-foreground" to="/faq">
+                FAQ
+              </Link>
               <Link className="hover:text-foreground" to="/contact">
                 Contact
               </Link>

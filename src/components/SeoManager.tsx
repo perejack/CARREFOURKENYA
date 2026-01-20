@@ -37,6 +37,13 @@ const seoForPath = (pathname: string) => {
         "Learn how we use cookies to improve site performance, analytics, and your browsing experience.",
     };
   }
+  if (pathname === "/faq") {
+    return {
+      title: "FAQ - Frequently Asked Questions | Carrefour Kenya Careers",
+      description:
+        "Find answers to common questions about Carrefour Kenya job applications, requirements, salaries, benefits, and career opportunities. Get all the information you need before applying.",
+    };
+  }
   return defaultSeo;
 };
 

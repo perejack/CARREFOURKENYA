@@ -9,7 +9,7 @@ interface JobCardProps {
   medical: string;
   category: string;
   image?: string;
-  onApply: () => void;
+  onApply: (e?: React.MouseEvent) => void;
 }
 
 export const JobCard = ({ title, salary, medical, category, image, onApply }: JobCardProps) => {
@@ -48,7 +48,11 @@ export const JobCard = ({ title, salary, medical, category, image, onApply }: Jo
         </div>
 
         <Button 
-          onClick={onApply}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onApply(e);
+          }}
           className="w-full bg-secondary hover:bg-secondary/90"
         >
           Apply Now

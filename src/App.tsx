@@ -10,6 +10,9 @@ import Contact from "./pages/Contact";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Cookies from "./pages/Cookies";
+import JobDetail from "./pages/JobDetail";
+import CategoryPage from "./pages/CategoryPage";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +25,9 @@ const App = () => (
         <SeoManager />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/jobs/:slug" element={<JobDetail />} />
+          <Route path="/jobs/category/:categorySlug" element={<CategoryPage />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
