@@ -44,6 +44,22 @@ const seoForPath = (pathname: string) => {
         "Find answers to common questions about Carrefour Kenya job applications, requirements, salaries, benefits, and career opportunities. Get all the information you need before applying.",
     };
   }
+  if (pathname === "/blog") {
+    return {
+      title: "Carrefour Kenya Career Blog | Job Search Tips & Retail News",
+      description:
+        "The official Carrefour Kenya Career Blog. Get expert job search tips, interview preparation guides, retail industry news, and salary insights for the Kenyan job market.",
+    };
+  }
+  if (pathname.startsWith("/jobs/location/")) {
+    const locationSlug = pathname.split("/").pop();
+    const locationName = locationSlug ? locationSlug.charAt(0).toUpperCase() + locationSlug.slice(1) : "Kenya";
+    return {
+      title: `Carrefour Kenya Jobs in ${locationName} | ${locationName} Vacancies`,
+      description:
+        `Find all open Carrefour Kenya job opportunities in ${locationName}. Apply for retail, logistics, and management vacancies in ${locationName} today.`,
+    };
+  }
   return defaultSeo;
 };
 

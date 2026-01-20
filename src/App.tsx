@@ -13,6 +13,9 @@ import Cookies from "./pages/Cookies";
 import JobDetail from "./pages/JobDetail";
 import CategoryPage from "./pages/CategoryPage";
 import FAQ from "./pages/FAQ";
+import LocationPage from "./pages/LocationPage";
+import BlogIndex from "./pages/BlogIndex";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/jobs/:slug" element={<JobDetail />} />
           <Route path="/jobs/category/:categorySlug" element={<CategoryPage />} />
+          <Route path="/jobs/location/:locationSlug" element={<LocationPage />} />
+          <Route path="/blog" element={<BlogIndex />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/privacy" element={<Privacy />} />

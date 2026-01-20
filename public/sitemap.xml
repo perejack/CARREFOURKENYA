@@ -171,4 +171,62 @@
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
+  <!-- Location Pages -->
+  <url>
+    <loc>https://www.carefourjobopportunities.site/jobs/location/nairobi</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/jobs/location/mombasa</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/jobs/location/kisumu</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/jobs/location/nakuru</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/jobs/location/eldoret</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Blog Pages -->
+  <url>
+    <loc>https://www.carefourjobopportunities.site/blog</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/blog/how-to-write-a-winning-cv-for-retail-jobs-in-kenya</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/blog/top-10-interview-questions-for-a-carrefour-job</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.carefourjobopportunities.site/blog/a-guide-to-retail-salaries-in-kenya-what-to-expect-in-2026</loc>
+    <lastmod>2026-01-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
 </urlset>

@@ -216,6 +216,15 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center text-muted-foreground">
           <div className="flex flex-col items-center gap-4">
             <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+              <Link className="hover:text-foreground" to="/jobs/location/nairobi">
+                Jobs in Nairobi
+              </Link>
+              <Link className="hover:text-foreground" to="/jobs/location/mombasa">
+                Jobs in Mombasa
+              </Link>
+              <Link className="hover:text-foreground" to="/blog">
+                Blog
+              </Link>
               <Link className="hover:text-foreground" to="/faq">
                 FAQ
               </Link>
