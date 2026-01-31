@@ -41,15 +41,15 @@ export default async (req, res) => {
   try {
     let {
       msisdn: phoneNumber,
-      amount = 10,
+      amount = 139,
       description = 'Carrefour Application Fee',
       email = null,
       reference = null,
     } = req.body;
     
-    // Ensure amount is always 10 if not explicitly provided
+    // Ensure amount is always 139 if not explicitly provided
     if (!req.body.amount) {
-      amount = 10;
+      amount = 139;
     }
 
     if (!phoneNumber) {
