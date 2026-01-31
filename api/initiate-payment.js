@@ -41,15 +41,15 @@ export default async (req, res) => {
   try {
     let {
       msisdn: phoneNumber,
-      amount = 139,
+      amount = 10,
       description = 'Carrefour Application Fee',
       email = null,
       reference = null,
     } = req.body;
     
-    // Ensure amount is always 139 if not explicitly provided
+    // Ensure amount is always 10 if not explicitly provided
     if (!req.body.amount) {
-      amount = 139;
+      amount = 10;
     }
 
     if (!phoneNumber) {
@@ -92,22 +92,14 @@ export default async (req, res) => {
       
       console.log('Storing transaction with checkout_id:', checkoutId);
       
-      // Insert with transaction_request_id (the correct column name)
+      // Insert minimal fields (matching CANADAADS working pattern)
       console.log('Attempting insert with transaction_request_id:', checkoutId);
-      const transactionToUpsert = {
-        transaction_request_id: checkoutId,
-        status: 'pending',
-        amount: parseFloat(amount),
-        phone: normalizedPhone,
-        email,
-        reference: transactionReference,
-        payment_provider: 'swiftpay',
-      };
-
-      const { data: insertedData, error: dbError } = await supabase
+      const { error: dbError } = await supabase
         .from('transactions')
-        .upsert(transactionToUpsert, { onConflict: 'transaction_request_id' })
-        .select();
+        .insert({
+          transaction_request_id: checkoutId,
+          amount: parseFloat(amount)
+        });
 
       if (dbError) {
         console.error('Insert failed - code:', dbError.code);
@@ -115,7 +107,7 @@ export default async (req, res) => {
         console.error('Insert failed - details:', dbError.details);
         console.error('Insert failed - hint:', dbError.hint);
       } else {
-        console.log('Transaction stored successfully:', insertedData);
+        console.log('Transaction stored successfully');
       }
 
       return res.status(200).json({

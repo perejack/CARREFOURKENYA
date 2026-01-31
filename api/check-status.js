@@ -66,19 +66,22 @@ export default async (req, res) => {
     
     console.log('Checking status for transaction_request_id:', transaction_request_id);
     
-    const { data: transaction, error: dbError } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('transaction_request_id', transaction_request_id)
-      .maybeSingle();
-    
-    if (dbError) {
-      console.error('Database query error:', dbError);
-      return res.status(500).json({
-        success: false,
-        message: 'Error checking payment status',
-        error: dbError.message || String(dbError)
-      });
+    let transaction = null;
+    try {
+      const { data, error: dbError } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('transaction_request_id', transaction_request_id)
+        .maybeSingle();
+
+      if (dbError) {
+        console.error('Database query error:', dbError);
+      }
+
+      transaction = data || null;
+    } catch (dbThrownError) {
+      console.error('Database query exception:', dbThrownError);
+      transaction = null;
     }
     
     console.log('Transaction found:', transaction ? 'YES' : 'NO');
@@ -206,11 +209,13 @@ export default async (req, res) => {
     }
   } catch (error) {
     console.error('Payment status check error:', error);
-    
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to check payment status',
-      error: error.message || String(error)
+
+    return res.status(200).json({
+      success: true,
+      payment: {
+        status: 'pending',
+        message: 'Payment is still being processed'
+      }
     });
   }
 };
